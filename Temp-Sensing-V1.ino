@@ -21,7 +21,7 @@ int relay1;
 int relay2;
 int alarm;
 
-//Define and output word variable
+//Define input and output word variable
 char outWord; 
 char inWord;
 
@@ -54,7 +54,7 @@ void loop() {
   //
 
   //Read temp sensor voltages and set temp variabes
-  for (int i = 0, i < 4, i++) {
+  for (int i = 0, i < 5, i++) {
     setTemp(temps[i], tempPins[i]);
   }
 
