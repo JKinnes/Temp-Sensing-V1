@@ -49,9 +49,21 @@ void loop() {
     inWord[] = Serial.readStringUntil('\n');
   }
 
-  //Set alarming criteria based on input word
-
-  //
+  //Set relay activation voltages based on input word
+  if (inWord[0] = 1) {
+    digitalWrite(relay1, HIGH);
+    digitalWrite(relay2, HIGH);
+  } else if (inWord[0] = 0) {
+    digitalWrite(relay1, LOW);
+    digitalWrite(relay2, LOW);
+  }
+  
+  //Set alarm activation voltage based on input word
+  if (inWord[0] = 1) {
+    digitalWrite(alarm, HIGH);
+  } else if (inWord[0] = 0) {
+    digitalWrite(alarm, LOW);
+  }
 
   //Read temp sensor voltages and set temp variabes
   for (int i = 0, i < 5, i++) {
@@ -64,15 +76,10 @@ void loop() {
     Character 1: State of power relays (1 or 0)
     Character 2: State of alarm (1 or 0)
     Characters 3 and 4: temp1 degrees (Hexadecimal)
-    Character 5: Decimal for temp1
-    Characters 6 and 7: temp2 degrees (Hexadecimal)
-    Character 8: Decimal for temp2
-    Characters 9 and 10: temp3 degrees (Hexadecimal)
-    Character 11: Decimal for temp3
-    Characters 12 and 13: temp4 degrees (Hexadecimal)
-    Character 14: Decimal for temp4
-    Characters 15 and 16: temp5 degrees (Hexadecimal)
-    Character 17: Decimal for temp5
+    Characters 5 and 6: temp2 degrees (Hexadecimal)
+    Characters 7 and 8: temp3 degrees (Hexadecimal)
+    Characters 9 and 10: temp4 degrees (Hexadecimal)
+    Characters 11 and 12: temp5 degrees (Hexadecimal)
     Output word is printed and loop is repeated every 250ms
   */
   Serial.println(outWord[i]);
