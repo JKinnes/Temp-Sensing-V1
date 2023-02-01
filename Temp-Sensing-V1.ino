@@ -1,20 +1,11 @@
 //Define floats for each temperature sensor
-float temp1; 
-float temp2; 
-float temp3; 
-float temp4; 
-float temp5; 
+float temp[4];
 
 //Set pins for each temperature sensor
-int temp1pin;
-int temp2pin;
-int temp3pin;
-int temp4pin;
-int temp5pin;
+int tempPin[4] = {1, 2, 3, 4, 5};
 
-//Define Arrays for temps and temp pins
-float temps[];
-int tempPins[];
+//Define character arrays for each temperature hex value
+char tempHex[4][1];
 
 //Set pins for alarming conditions
 int relay1; 
@@ -22,8 +13,8 @@ int relay2;
 int alarm;
 
 //Define input and output word variable
-char outWord; 
-char inWord;
+char outWord[11]; 
+char inWord[1];
 
 
 void setup() {
@@ -35,6 +26,11 @@ float setTemp(temp, pin) {
   //read voltage on pin, correct for scaling, and set temp equal
   temp = ((analog.read(pin) / 1024) * 100);
   return temp;
+}
+
+char setTempHex(tempHex, output){
+
+
 }
 
 void loop() {
@@ -59,15 +55,22 @@ void loop() {
   }
   
   //Set alarm activation voltage based on input word
-  if (inWord[0] = 1) {
+  if (inWord[1] = 1) {
     digitalWrite(alarm, HIGH);
-  } else if (inWord[0] = 0) {
+  } else if (inWord[1] = 0) {
     digitalWrite(alarm, LOW);
   }
 
-  //Read temp sensor voltages and set temp variabes
+  //Read temp sensor voltages and set temp array floats
   for (int i = 0, i < 5, i++) {
-    setTemp(temps[i], tempPins[i]);
+    temp[i] = round(((analog.read(tempPin[i]) / 1024) * 1000)/10);
+  }
+
+  //
+
+  //Read temp sensor values and convert to hex
+  for (int i = 0, i < 5, i++) {
+    char hexTemp[1] = String(temp[i], HEX); //????
   }
 
   /*
