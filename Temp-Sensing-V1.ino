@@ -38,6 +38,7 @@ void loop() {
   if (inWord[0] == 1) {
     digitalWrite(relay1, HIGH);
     digitalWrite(relay2, HIGH);
+    Serial.print("Got");
   } else if (inWord[0] == 0) {
     digitalWrite(relay1, LOW);
     digitalWrite(relay2, LOW);
@@ -58,7 +59,7 @@ void loop() {
 
   //Begin writing data to output word
   //Set first element in outWord array to word start character
-  outWord[0] = "Start";
+  outWord[0] = 1;
 
   if (digitalRead(relay1) == HIGH){
   outWord[1] = 1;
@@ -76,8 +77,6 @@ void loop() {
     outWord[i+3] = temp[i];
   } 
 
-  outWord[8] = "End";
-
   /*
     Send serial data from Arduino to Pi in several serial messages from outWord array
     Output word to the Arduino is defined as follows:
@@ -89,12 +88,18 @@ void loop() {
     Character 6: temp3 degrees
     Character 7: temp4 degrees
     Character 8: temp5 degrees
-    Character 9: Word end character
+    Character 9: Word end character (Separate serial statement)
     Output word is printed and loop is repeated every 250ms
-  */
-  for (int i = 0; i < 9; i++){
-  Serial.println(outWord[i]);
+  * /
+  for (int i = 0; i < 8; i++){
+  Serial.print(outWord[i]);
   }
+
+  //Serial.println("End");
+  //Serial.println(outWord[0]); */
+
+  outWord[1] = 1;
+  Serial.println(outWord[1]);
 
   delay(250);
 }
