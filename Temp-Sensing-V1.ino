@@ -1,11 +1,8 @@
 //Define floats for each temperature sensor
-float temp[4];
+float temp[5];
 
 //Set pins for each temperature sensor
-int tempPin[4] = {1, 2, 3, 4, 5};
-
-//Define character arrays for each temperature hex value
-char tempHex[4][1];
+int tempPin[5] = {1, 2, 3, 4, 5};
 
 //Set pins for alarming conditions
 int relay1; 
@@ -13,8 +10,8 @@ int relay2;
 int alarm;
 
 //Define input and output word variable
-char outWord[11]; 
-char inWord[1];
+char inWord[32];
+char outWord[9];
 
 
 void setup() {
@@ -22,69 +19,82 @@ void setup() {
   Serial.begin(9600);
 }
 
-float setTemp(temp, pin) {
-  //read voltage on pin, correct for scaling, and set temp equal
-  temp = ((analog.read(pin) / 1024) * 100);
-  return temp;
-}
-
-char setTempHex(tempHex, output){
-
-
-}
-
 void loop() {
 
-  /*
-    Check for serial data from Pi
+
+  /*Check for serial data from Pi
     Input word to the Arduino is defined as follows:
     Character 1: State of power relays (1 or 0)
-    Character 2: State of alarm (1 or 0)
-  */
-  if(Serial.available() > 0) {
-    inWord[] = Serial.readStringUntil('\n');
+    Character 2: State of alarm (1 or 0)*/
+
+  int availableBytes = Serial.available();
+
+  for(int i=0; i<availableBytes; i++) {
+    inWord[i] = Serial.read();
   }
+  
 
   //Set relay activation voltages based on input word
-  if (inWord[0] = 1) {
+  if (inWord[0] == 1) {
     digitalWrite(relay1, HIGH);
     digitalWrite(relay2, HIGH);
-  } else if (inWord[0] = 0) {
+  } else if (inWord[0] == 0) {
     digitalWrite(relay1, LOW);
     digitalWrite(relay2, LOW);
   }
   
   //Set alarm activation voltage based on input word
-  if (inWord[1] = 1) {
+  if (inWord[1] == 1) {
     digitalWrite(alarm, HIGH);
-  } else if (inWord[1] = 0) {
+  } else if (inWord[1] == 0) {
     digitalWrite(alarm, LOW);
   }
 
   //Read temp sensor voltages and set temp array floats
-  for (int i = 0, i < 5, i++) {
-    temp[i] = round(((analog.read(tempPin[i]) / 1024) * 1000)/10);
+  //Round temp values to the nearest degree
+  for (int i = 0; i < 5; i++) {
+    temp[i] = (round((analogRead(tempPin[i]) / 1024) * 1000)/10);
   }
 
-  //
+  //Begin writing data to output word
+  //Set first element in outWord array to word start character
+  outWord[0] = "Start";
 
-  //Read temp sensor values and convert to hex
-  for (int i = 0, i < 5, i++) {
-    char hexTemp[1] = String(temp[i], HEX); //????
+  if (digitalRead(relay1) == HIGH){
+  outWord[1] = 1;
+  } else if (digitalRead(relay1) == LOW){
+    outWord[1] = 0;
   }
+
+  if (digitalRead(alarm) == HIGH){
+  outWord[2] = 1;
+  } else if (digitalRead(alarm) == LOW){
+    outWord[2] = 0;
+  }
+
+  for (int i = 0; i < 5; i++) {
+    outWord[i+3] = temp[i];
+  } 
+
+  outWord[8] = "End";
 
   /*
-    Send serial data from Arduino to Pi
+    Send serial data from Arduino to Pi in several serial messages from outWord array
     Output word to the Arduino is defined as follows:
-    Character 1: State of power relays (1 or 0)
-    Character 2: State of alarm (1 or 0)
-    Characters 3 and 4: temp1 degrees (Hexadecimal)
-    Characters 5 and 6: temp2 degrees (Hexadecimal)
-    Characters 7 and 8: temp3 degrees (Hexadecimal)
-    Characters 9 and 10: temp4 degrees (Hexadecimal)
-    Characters 11 and 12: temp5 degrees (Hexadecimal)
+    Character 1: Word start character
+    Character 2: State of power relays (1 or 0)
+    Character 3: State of alarm (1 or 0)
+    Character 4: temp1 degrees
+    Character 5: temp2 degrees
+    Character 6: temp3 degrees
+    Character 7: temp4 degrees
+    Character 8: temp5 degrees
+    Character 9: Word end character
     Output word is printed and loop is repeated every 250ms
   */
+  for (int i = 0; i < 9; i++){
   Serial.println(outWord[i]);
+  }
+
   delay(250);
 }
