@@ -33,7 +33,7 @@ void loop() {
     Serial.print("You sent me: ");
     Serial.println(data);
 
-    if (data.charAt(1) == 1) {  //SERIAL OUTPUT ISSUE RESOLVED, SERIAL READ ISSUE REMAINS. BOARD SEES INPUT AND WRITES TO data STRING. READING data STRING IS CURRENT ISSUE
+    if (data.charAt(1) == '1') {  //SERIAL OUTPUT ISSUE RESOLVED, SERIAL READ ISSUE REMAINS. BOARD SEES INPUT AND WRITES TO data STRING. READING data STRING IS CURRENT ISSUE
       digitalWrite(relay1, HIGH);
       digitalWrite(relay2, HIGH);
       Serial.print("Got");
