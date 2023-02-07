@@ -17,6 +17,10 @@ String inWord;
 String zero = "0";
 String one = "1";
 
+//Define warning variables
+int alarmWarn = 0;
+int alarmTrigger = 0;
+
 void setup() {
   //Set up serial communication with Raspberry Pi
   Serial.begin(9600);
@@ -34,7 +38,7 @@ void loop() {
     Serial.println(inWord);
 
   //Set relay activation voltages based on input word
-    if (inWord.startsWith(one)) {  //SERIAL OUTPUT ISSUE RESOLVED, SERIAL READ ISSUE REMAINS. BOARD SEES INPUT AND WRITES TO data STRING. READING data STRING IS CURRENT ISSUE
+    if (inWord.startsWith(one)) {
       digitalWrite(relay1, HIGH);
       digitalWrite(relay2, HIGH);
     } else if (inWord.startsWith(zero)) {
@@ -56,9 +60,9 @@ void loop() {
     temp[i] = (round((analogRead(tempPin[i]) / 1024) * 1000)/10);
   }
 
-  //Define and reset warning variables;
-  int alarmWarn = 0;
-  int alarmTrigger = 0;
+  //Reset warning variables;
+  alarmWarn = 0;
+  alarmTrigger = 0;
 
   //Check if any temp sensors are 150 or over. Set alarm warning if true
   for (int i = 0; i < 5; i++) {
@@ -120,5 +124,9 @@ void loop() {
   Serial.println(outWord[i]);
   }
 
-  delay(250);
+  if(alarmTrigger == 1){    
+    delay(1000);
+  }else {
+    delay(250);
+  }
 }
