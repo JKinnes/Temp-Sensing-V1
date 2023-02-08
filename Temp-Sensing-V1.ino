@@ -57,7 +57,7 @@ void loop() {
   //Read temp sensor voltages and set temp array floats
   //Round temp values to the nearest degree
   for (int i = 0; i < 5; i++) {
-    temp[i] = (round((analogRead(tempPin[i]) / 1024) * 1000)/10);
+    temp[i] = (round(((5 * analogRead(tempPin[i])) / 1024) * 1000)/10);
   }
 
   //Reset warning variables;
@@ -68,14 +68,14 @@ void loop() {
   for (int i = 0; i < 5; i++) {
     if (temp[i] >= 150){
       //Set alarmWarn to sensor over 150 to track for second check
-      alarmWarn = i;
+      alarmWarn = i + 1;
     }
   }
 
   //If second sensor is over 150, trigger alarm
   if(alarmWarn != 0){
     for (int i = 0; i < 5; i++) {
-     if (temp[i] >= 150 && i != alarmWarn){
+     if (temp[i] >= 150 && i != (alarmWarn - 1)){
        alarmTrigger = 1;
         //Remove relay activation voltage
         digitalWrite(relay1, LOW);
