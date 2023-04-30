@@ -2,12 +2,12 @@
 double temp[5];
 
 //Set pins for each temperature sensor
-int tempPin[5] = {0, 2, 4, 6, 8};
+double tempPin[5] = {0, 2, 4, 6, 8};
 
 //Set pins for alarming conditions
-double relay1 = 39; 
-double relay2 = 41;
-double alarm = 12;
+int relay1 = 39; 
+int relay2 = 41;
+int alarm = 12;
 
 //Define input and output word variable
 double outWord[9];
@@ -18,12 +18,16 @@ String zero = "0";
 String one = "1";
 
 //Define warning variables
+
 int alarmWarn = 0;
 int alarmTrigger = 0;
 
 void setup() {
   //Set up serial communication with Raspberry Pi
   Serial.begin(9600);
+  pinMode(41, OUTPUT);
+  pinMode(39, OUTPUT);
+  pinMode(12, OUTPUT);
 }
 
 void loop() {
@@ -34,30 +38,35 @@ void loop() {
     Character 2: State of alarm (1 or 0)*/
   if (Serial.available() > 0){
     inWord = Serial.readStringUntil('\n');
-    Serial.print("You sent me: ");
-    Serial.println(inWord);
+    //Serial.print("You sent me: ");
+    //Serial.println(inWord);
 
   //Set relay activation voltages based on input word
-    if (inWord.startsWith(one)) {
+    if (inWord.startsWith(zero)) {
       digitalWrite(relay1, HIGH);
       digitalWrite(relay2, HIGH);
-    } else if (inWord.startsWith(zero)) {
+      outWord[1] = 0;
+    } else if (inWord.startsWith(one)) {
       digitalWrite(relay1, LOW);
       digitalWrite(relay2, LOW);
+      outWord[1] = 1;
     }
 
   //Set alarm activation voltage based on input word
     if (inWord.endsWith(one)) {
-      digitalWrite(alarm, HIGH);
+      tone(alarm, 1000);
+      outWord[2] = 1;
     } else if (inWord.endsWith(zero)) {
-      digitalWrite(alarm, LOW);
+      noTone(alarm);
+      outWord[2] = 0;
+      alarmTrigger = 0;
     } 
   }
 
   //Read temp sensor voltages and set temp array floats
   //Round temp values to the nearest degree
   for (int i = 0; i < 5; i++) {
-    temp[i] = (round(((5 * analogRead(tempPin[i])) / 1024) * 1000)/10);
+    temp[i] = round(analogRead(tempPin[i]))*500/1024;
   }
 
   //Reset warning variables;
@@ -78,10 +87,10 @@ void loop() {
      if (temp[i] >= 150 && i != (alarmWarn - 1)){
        alarmTrigger = 1;
         //Remove relay activation voltage
-        digitalWrite(relay1, LOW);
-        digitalWrite(relay2, LOW);
+        digitalWrite(relay1, HIGH);
+        digitalWrite(relay2, HIGH);
         //Apply buzzer voltage        
-        digitalWrite(alarm, HIGH);
+        tone(alarm, 1000);
      }
     }
   }
@@ -89,18 +98,6 @@ void loop() {
   //Begin writing data to output word
   //Set first element in outWord array to word start character
   outWord[0] = 1234;
-
-  if (digitalRead(relay1) == HIGH){
-  outWord[1] = 1;
-  } else if (digitalRead(relay1) == LOW){
-    outWord[1] = 0;
-  }
-
-  if (digitalRead(alarm) == HIGH){
-  outWord[2] = 1;
-  } else if (digitalRead(alarm) == LOW){
-    outWord[2] = 0;
-  }
 
   for (int i = 0; i < 5; i++) {
     outWord[i+3] = temp[i];
